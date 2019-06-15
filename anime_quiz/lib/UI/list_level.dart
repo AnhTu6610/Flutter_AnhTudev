@@ -9,7 +9,7 @@ class List_Level extends StatefulWidget {
   final User user;
 
   const List_Level({Key key, this.question, this.user}) : super(key: key);
-  
+
   @override
   _List_LevelState createState() => _List_LevelState(question, user);
 }
@@ -22,20 +22,26 @@ class _List_LevelState extends State<List_Level> {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => Bonus_Coins()));
   }
+
   _pushLevel() {
     //Navigator.push(context, MaterialPageRoute(builder: (context) => List_Level()));
   }
   _PlayGame(List<Question> questionList, int index) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Play_Game(questionList: questionList, index: index, user: user )));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Play_Game(
+                questionList: questionList, index: index, user: user)));
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
@@ -120,26 +126,41 @@ class _List_LevelState extends State<List_Level> {
   List<Widget> _Level() {
     //int number = question.length;
     //List<Question> qq = question;
-    List<RaisedButton> buttons = new List<RaisedButton>.generate(question.length, (int index) {
+    List<RaisedButton> buttons =
+        new List<RaisedButton>.generate(question.length, (int index) {
       return new RaisedButton(
         onPressed: () {
-          _PlayGame(question, index);
+          if (index != 0) {
+            if (question[index - 1].status == 1)
+              _PlayGame(question, index);
+          }else{
+            _PlayGame(question, index);
+          }
+          
         },
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20.0))
-        ),
+            borderRadius: BorderRadius.all(Radius.circular(20.0))),
         color: Colors.white,
         child: Stack(
           children: <Widget>[
-            if (question[index].status == 0 && question[index].id != 1)
-              Container(
-                alignment: Alignment(0.0, 0.0),
-                child: Icon(
-                  Icons.lock,
-                  color: Colors.green,
-                  size: 50.0,
-                ),
-              )
+            if (index != 0)
+              if (question[index - 1].status == 1)
+                Container(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/imagesGame/${question[index].linkimage}',
+                    fit: BoxFit.fill,
+                  ),
+                )
+              else
+                Container(
+                  alignment: Alignment(0.0, 0.0),
+                  child: Icon(
+                    Icons.lock,
+                    color: Colors.green,
+                    size: 50.0,
+                  ),
+                )
             else
               Container(
                 alignment: Alignment.center,
@@ -151,7 +172,7 @@ class _List_LevelState extends State<List_Level> {
             Container(
               alignment: Alignment(1.0, 1.0),
               child: Text(
-                (index+1).toString(),
+                (index + 1).toString(),
                 style: TextStyle(fontSize: 20.0, color: Colors.black),
               ),
             ),

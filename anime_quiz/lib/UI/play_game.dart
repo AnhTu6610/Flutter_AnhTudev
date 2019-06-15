@@ -1,10 +1,13 @@
 import 'package:anime_quiz/UI/bonus_coins.dart';
 import 'package:anime_quiz/entitys/question.dart';
 import 'package:anime_quiz/entitys/user.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:anime_quiz/controller/play_game_controller.dart';
 import 'package:anime_quiz/entitys/traloi.dart';
 import 'package:anime_quiz/controller/controller.dart';
+import 'package:anime_quiz/controller/audio_controller.dart';
 
 class Play_Game extends StatefulWidget {
   final List<Question> questionList;
@@ -21,6 +24,7 @@ class _Play_GameState extends State<Play_Game> {
   int index;
   User user;
 
+  AudioController audioController = new AudioController();
   Question question = new Question();
   Play_Game_Controller play_game_controller = new Play_Game_Controller();
   Controller controller = new Controller();
@@ -38,7 +42,7 @@ class _Play_GameState extends State<Play_Game> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    
+    audioController.sourceNewLevel();
     luuTraLoi = play_game_controller.khoiTaoLuuTraLoi(question.dapan);
     listDapAn = play_game_controller.tachChuoi(question.dapan);
     listDapAnDaTron = play_game_controller.tronDapAn(listDapAn);
@@ -75,6 +79,7 @@ class _Play_GameState extends State<Play_Game> {
     if(dem != 0){
       for (var i = 0; i < luuTraLoi.length; i++) {
         if (luuTraLoi[i].chuCai == '') {
+          audioController.sourceChonO();
           setState(() {
             anHienOChon[vitrichon] = false;
             luuTraLoi[i].chuCai = chucai;
@@ -96,19 +101,23 @@ class _Play_GameState extends State<Play_Game> {
       if(kiemtraketqua() == true){
         controller.updateQuestion(question);
         controller.congCoin(user);
+        audioController.sourceWin();
         thongbaowin(context);
       }else{
-
+        audioController.sourceSai();
       }
     }
   }
   xuLyTraLaiChuCai(String chuCaiTra, int viTriTra) {
-    setState(() {
-      anHienOChon[luuTraLoi[viTriTra].viTriChon] = true;
-      luuTraLoi[viTriTra].chuCai = '';
-      luuTraLoi[viTriTra].viTriChon = null;
-      luuTraLoi[viTriTra].viTriDien = null;
-    });
+    if(chuCaiTra != ''){
+      audioController.sourceTraO();
+      setState(() {
+        anHienOChon[luuTraLoi[viTriTra].viTriChon] = true;
+        luuTraLoi[viTriTra].chuCai = '';
+        luuTraLoi[viTriTra].viTriChon = null;
+        luuTraLoi[viTriTra].viTriDien = null;
+      });
+    }
   }
   bool kiemtraketqua(){
     int tam = 0;
@@ -382,35 +391,70 @@ class _Play_GameState extends State<Play_Game> {
                     ),
                   ),
                   Container(
-                      //height: 100,
-                      //color: Colors.yellow[800],
-                      child: Wrap(
-                        spacing: 5.0,
+                      child: Column(
                         children: <Widget>[
-                          for (var i = 0; i < 18; i++)
-                            Container(
-                              width: 40.0,
-                              alignment: Alignment.center,
-                              child: Visibility(
-                                visible: anHienOChon[i],
-                                child: RaisedButton(
-                                  padding: EdgeInsets.only(left: 0, right: 0),
-                                  child: Text(
-                                    //--------------------------------------------------------------------------- Noi Chon Chu cai
-                                    listDapAnDaTron[i],
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 30.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              for (var i = 0; i < 9; i++)
+                              Container(
+                                //width: 40.0,
+                                constraints: BoxConstraints(
+                                  maxWidth: 40.0,
+                                  minWidth: 30.0,
+                                ),
+                                alignment: Alignment.center,
+                                child: Visibility(
+                                  visible: anHienOChon[i],
+                                  child: RaisedButton(
+                                    padding: EdgeInsets.only(left: 0, right: 0),
+                                    child: Text(
+                                      listDapAnDaTron[i],
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 30.0),
+                                    ),
+                                    color: Colors.green,
+                                    splashColor: Colors.white,
+                                    onPressed: () {
+                                      xuLyChonChucai(listDapAnDaTron[i], i);
+                                    },
                                   ),
-                                  color: Colors.green,
-                                  splashColor: Colors.white,
-                                  onPressed: () {
-                                    xuLyChonChucai(listDapAnDaTron[i], i);
-                                  },
                                 ),
                               ),
-                            ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              for (var i = 9; i < 18; i++)
+                              Container(
+                                //width: 40.0,
+                                constraints: BoxConstraints(
+                                  maxWidth: 40.0,
+                                  minWidth: 30.0,
+                                ),
+                                alignment: Alignment.center,
+                                child: Visibility(
+                                  visible: anHienOChon[i],
+                                  child: RaisedButton(
+                                    padding: EdgeInsets.only(left: 0, right: 0),
+                                    child: Text(
+                                      listDapAnDaTron[i],
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 30.0),
+                                    ),
+                                    color: Colors.green,
+                                    splashColor: Colors.white,
+                                    onPressed: () {
+                                      xuLyChonChucai(listDapAnDaTron[i], i);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
                         ],
-                      )
+                      ),
                     ),
                 ],
               ),

@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
         children: <Widget>[
           Center(
             child: new Image.asset(
-              'assets/images/bg.jpg',
+              'assets/images/bg.png',
               width: size.width,
               height: size.height,
               fit: BoxFit.fill,
@@ -56,11 +56,13 @@ class _HomeState extends State<Home> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Spacer(flex: 1),
-                Text(
-                  "Game\nAnime Quiz",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
+                Container(
+                  child: Text(
+                    "Game\nAnime Quiz",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 Spacer(flex: 1),
