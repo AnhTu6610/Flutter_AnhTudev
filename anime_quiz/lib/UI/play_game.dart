@@ -13,13 +13,15 @@ class Play_Game extends StatefulWidget {
   final List<Question> questionList;
   final int index;
   final User user;
-  const Play_Game({Key key, this.questionList, this.index, this.user}) : super(key: key);
-  
+  const Play_Game({Key key, this.questionList, this.index, this.user})
+      : super(key: key);
+
   @override
   _Play_GameState createState() => _Play_GameState(questionList, index, user);
 }
 
 class _Play_GameState extends State<Play_Game> {
+
   List<Question> questionList;
   int index;
   User user;
@@ -31,10 +33,29 @@ class _Play_GameState extends State<Play_Game> {
   List<String> listDapAn = new List<String>();
   List<String> listDapAnDaTron = new List<String>();
   List<TraLoi> luuTraLoi = new List<TraLoi>();
-  List<bool> anHienOChon = [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true];
-  
+  List<bool> anHienOChon = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ];
+
   //Contructer
-  _Play_GameState(this.questionList, this.index, this.user){
+  _Play_GameState(this.questionList, this.index, this.user) {
     question = questionList[index];
   }
 
@@ -47,18 +68,85 @@ class _Play_GameState extends State<Play_Game> {
     listDapAn = play_game_controller.tachChuoi(question.dapan);
     listDapAnDaTron = play_game_controller.tronDapAn(listDapAn);
   }
-  _nextLevel(){
+  _troGiup(){
+    if(user.coin > 0){
+      controller.truCoin(user);
+      if(luuTraLoi[0].chuCai == ''){
+        luuTraLoi[0].chuCai = listDapAn[0];
+        luuTraLoi[0].viTriDien = 0;
+        for (var i = 0; i < listDapAnDaTron.length; i++) {
+          if(luuTraLoi[0].chuCai == listDapAnDaTron[i]){
+            luuTraLoi[0].viTriChon = i;
+            anHienOChon[i] = false;
+            break;
+          }
+        }
+        setState(() {
+          
+        });
+        return;
+      }else{
+        for (var i = 1; i < luuTraLoi.length; i++) {
+          if(luuTraLoi[i].chuCai == '' && luuTraLoi[i-1].chuCai != ''){
+            luuTraLoi[i].chuCai = listDapAn[i];
+            luuTraLoi[i].viTriDien = i;
+            for (var j = 0; j < listDapAnDaTron.length; j++) {
+              if(luuTraLoi[i].chuCai.compareTo(listDapAnDaTron[j]) == 0){
+                if(anHienOChon[j] == true){
+                  luuTraLoi[i].viTriChon = j;
+                  anHienOChon[j] = false;
+                  break;
+                }
+              }
+            }
+            break;
+          }
+        }
+        setState(() {
+          
+        });
+        if (kiemtraketqua() == true) {
+          controller.updateQuestion(question);
+          controller.congCoin(user);
+          audioController.sourceWin();
+          thongbaowin(context);
+        }
+      }
+    }
+    
+  }
+  _nextLevel() {
     Navigator.pop(context);
     //Navigator.of(context).pop();
     setState(() {
-      index ++;
+      index++;
       question = questionList[index];
       luuTraLoi = play_game_controller.khoiTaoLuuTraLoi(question.dapan);
       listDapAn = play_game_controller.tachChuoi(question.dapan);
       listDapAnDaTron = play_game_controller.tronDapAn(listDapAn);
-      anHienOChon = [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true];
+      anHienOChon = [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ];
     });
   }
+
   _pushBonus() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => Bonus_Coins()));
@@ -72,11 +160,11 @@ class _Play_GameState extends State<Play_Game> {
     int dem = 0;
     int demNhapHetO = 0;
     for (var j = 0; j < luuTraLoi.length; j++) {
-      if(luuTraLoi[j].chuCai == ''){
-        dem ++;
+      if (luuTraLoi[j].chuCai == '') {
+        dem++;
       }
     }
-    if(dem != 0){
+    if (dem != 0) {
       for (var i = 0; i < luuTraLoi.length; i++) {
         if (luuTraLoi[i].chuCai == '') {
           audioController.sourceChonO();
@@ -90,26 +178,27 @@ class _Play_GameState extends State<Play_Game> {
         }
       }
       for (var j = 0; j < luuTraLoi.length; j++) {
-        if(luuTraLoi[j].chuCai == ''){
-          demNhapHetO ++;
+        if (luuTraLoi[j].chuCai == '') {
+          demNhapHetO++;
         }
       }
     }
     // Kiem tra va update du lieu DB
-    if(demNhapHetO == 0){
+    if (demNhapHetO == 0) {
       print(kiemtraketqua());
-      if(kiemtraketqua() == true){
+      if (kiemtraketqua() == true) {
         controller.updateQuestion(question);
         controller.congCoin(user);
         audioController.sourceWin();
         thongbaowin(context);
-      }else{
+      } else {
         audioController.sourceSai();
       }
     }
   }
+
   xuLyTraLaiChuCai(String chuCaiTra, int viTriTra) {
-    if(chuCaiTra != ''){
+    if (chuCaiTra != '') {
       audioController.sourceTraO();
       setState(() {
         anHienOChon[luuTraLoi[viTriTra].viTriChon] = true;
@@ -119,183 +208,204 @@ class _Play_GameState extends State<Play_Game> {
       });
     }
   }
-  bool kiemtraketqua(){
+
+  bool kiemtraketqua() {
     int tam = 0;
     for (var i = 0; i < luuTraLoi.length; i++) {
-      if(luuTraLoi[i].chuCai.compareTo(listDapAn[i]) == 0){
-        tam ++;
+      if (luuTraLoi[i].chuCai.compareTo(listDapAn[i]) == 0) {
+        tam++;
       }
     }
     return tam == luuTraLoi.length ? true : false;
   }
-  
-  thongbaowin(BuildContext context) {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      child: new SimpleDialog(
-        backgroundColor: Colors.lightGreen[100],
-        shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-        title: new Text(
-          'You Win',
-          style: TextStyle(
-            fontSize: 60.0,
-            color: Colors.yellow[900],
-          ),
-          textAlign: TextAlign.center, 
-        ),
 
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Container(
-                height: 200.0,
-                padding: EdgeInsets.only(bottom: 20.0),
-                child: new Image.asset("assets/imagesGame/${question.linkimage}",fit: BoxFit.contain),
-              ),
-              Container(
-                child: Text(
-                  question.dapan,
-                  style: TextStyle(fontSize: 40.0, color: Colors.lightBlue[900]),
+  thongbaowin(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        child: new SimpleDialog(
+          backgroundColor: Colors.lightGreen[100],
+          shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0)),
+          title: new Text(
+            'You Win',
+            style: TextStyle(
+              fontSize: 60.0,
+              color: Colors.yellow[900],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                Container(
+                  height: size.height/3,
+                  padding: EdgeInsets.only(bottom: 20.0),
+                  child: new Image.asset(
+                      "assets/imagesGame/${question.linkimage}",  
+                      fit: BoxFit.contain),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  OutlineButton(
-                    onPressed: (){},
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          '+',
-                          style: TextStyle(
-                            fontSize: 50.0,
-                            color: Colors.yellow[900],
-                          ),
-                        ),
-                        Image.asset(
-                          'assets/images/coin.png',
-                          height: 40.0,
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
-                    shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                    highlightElevation: 5.0,
-                    borderSide: BorderSide(
-                      width: 3.0,
-                      color: Colors.blue[300],
-                    ),
+                Container(
+                  child: Text(
+                    question.dapan,
+                    style:
+                        TextStyle(fontSize: 40.0, color: Colors.lightBlue[900]),
                   ),
-                  OutlineButton(
-                    onPressed: (){_nextLevel();},
-                    child: Icon(Icons.play_arrow, size: 50.0, color: Colors.redAccent,),
-                    shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
-                    highlightElevation: 5.0,
-                    borderSide: BorderSide(
-                      width: 3.0,
-                      color: Colors.red[200],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    OutlineButton(
+                      onPressed: () {},
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            '+',
+                            style: TextStyle(
+                              fontSize: 50.0,
+                              color: Colors.yellow[900],
+                            ),
+                          ),
+                          Image.asset(
+                            'assets/images/coin.png',
+                            height: 40.0,
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(20.0)),
+                      highlightElevation: 5.0,
+                      borderSide: BorderSide(
+                        width: 3.0,
+                        color: Colors.blue[300],
+                      ),
                     ),
-                  )
-                ],
-              )
-            ],
-          )
-        ],
-      )
-    );
+                    OutlineButton(
+                      onPressed: () {
+                        _nextLevel();
+                      },
+                      child: Icon(
+                        Icons.play_arrow,
+                        size: 50.0,
+                        color: Colors.redAccent,
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(20.0)),
+                      highlightElevation: 5.0,
+                      borderSide: BorderSide(
+                        width: 3.0,
+                        color: Colors.red[200],
+                      ),
+                    )
+                  ],
+                )
+              ],
+            )
+          ],
+        ));
   }
-  
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return MaterialApp(
       //title: "Nguyen Anh Tu",
       home: new Scaffold(
-        drawer: Drawer(
-          child: Row(
-            children: <Widget>[],
-          ),
-        ),
-        appBar: new AppBar(
-          backgroundColor: Colors.green,
-          automaticallyImplyLeading: true,
-          actions: <Widget>[
-            Container(
-              margin: EdgeInsets.only(right: 20.0),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(right: 15.0),
-                    child: RaisedButton(
-                      child: Text(
-                        'Level: ${index+1}',
-                        style: TextStyle(color: Colors.white, fontSize: 20.0),
+          // drawer: Drawer(
+          //   child: Row(
+          //     children: <Widget>[],
+          //   ),
+          // ),
+          appBar: new AppBar(
+            backgroundColor: Colors.green,
+            automaticallyImplyLeading: true,
+            actions: <Widget>[
+              Container(
+                margin: EdgeInsets.only(right: 20.0),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(right: 15.0),
+                      child: RaisedButton(
+                        child: Text(
+                          'Level: ${index + 1}',
+                          style: TextStyle(color: Colors.white, fontSize: 20.0),
+                        ),
+                        color: Colors.pink,
+                        elevation: 4.0,
+                        splashColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(20.0)),
+                        onPressed: () {
+                          _pushLevel();
+                        },
                       ),
-                      color: Colors.pink,
-                      elevation: 4.0,
-                      splashColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(20.0)),
-                      onPressed: () {
-                        _pushLevel();
-                      },
                     ),
-                  ),
-                  Container(
-                    child: RaisedButton(
-                      child: Wrap(
-                        spacing: 5.0,
-                        children: <Widget>[
-                          Text(
-                            '${user.coin}',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 20.0),
-                          ),
-                          Image.asset(
-                            'assets/images/coin.png',
-                            height: 23.0,
-                            fit: BoxFit.contain,
-                          ),
-                        ],
+                    Container(
+                      child: RaisedButton(
+                        child: Wrap(
+                          spacing: 5.0,
+                          children: <Widget>[
+                            Text(
+                              '${user.coin}',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 20.0),
+                            ),
+                            Image.asset(
+                              'assets/images/coin.png',
+                              height: 23.0,
+                              fit: BoxFit.contain,
+                            ),
+                          ],
+                        ),
+                        color: Colors.blueAccent,
+                        elevation: 4.0,
+                        splashColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(20.0)),
+                        onPressed: () {
+                          _pushBonus();
+                        },
                       ),
-                      color: Colors.blueAccent,
-                      elevation: 4.0,
-                      splashColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(20.0)),
-                      onPressed: () {
-                        _pushBonus();
-                      },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-        body: new Container(
-          constraints: BoxConstraints.expand(),
-          color: Colors.yellow[100],
-          child: Column(
+            ],
+          ),
+          body: new Material(
+            child: Container(
+              constraints: BoxConstraints.expand(),
+              color: Colors.yellow[100],
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
                     child: Text(
-                      "Who is this?",
+                      "Character's name ??",
                       style: TextStyle(fontSize: 30.0),
                     ),
-                    //height: 50,
-                    //color: Colors.amber,
                   ),
                   Container(
-                      height: size.height/2,
-                      child: new Image.asset(
-                              "assets/imagesGame/${question.linkimage}",
-                              fit: BoxFit.contain
-                          )
+                    height: size.height / 2,
+                    width: size.width,
+                    margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      border: Border.all(
+                        width: 5.0,
+                        color: Colors.yellow,
+                      ),
+                    ),
+                    child: new Image.asset(
+                      "assets/imagesGame/${question.linkimage}",
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   Container(
                     //height: 50,
@@ -312,31 +422,28 @@ class _Play_GameState extends State<Play_Game> {
                               child: Text(
                                 //--------------------------------------------------------------------------- Noi Tra Loi
                                 luuTraLoi[i].chuCai,
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 25.0),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 25.0),
                               ),
                               color: Colors.deepOrange,
                               splashColor: Colors.white,
-                              onPressed: () {xuLyTraLaiChuCai(luuTraLoi[i].chuCai,i);},
+                              onPressed: () {
+                                xuLyTraLaiChuCai(luuTraLoi[i].chuCai, i);
+                              },
                             ),
                           ),
                       ],
                     ),
                   ),
                   Container(
-                    //height: 50,
                     width: 400,
                     padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                    //color: Colors.green,
                     child: Wrap(
-                      //spacing: 60.0,
                       alignment: WrapAlignment.spaceAround,
                       children: <Widget>[
                         Container(
-                          //width: 150.0,
                           child: RaisedButton(
                             child: Wrap(
-                              //spacing: 10.0,
                               children: <Widget>[
                                 Icon(Icons.account_circle, color: Colors.amber),
                                 Text(
@@ -348,32 +455,17 @@ class _Play_GameState extends State<Play_Game> {
                             ),
                             color: Colors.purple,
                             splashColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30.0))),
                             onPressed: () {},
                           ),
                         ),
-                        ButtonTheme(
-                          minWidth: 40.0,
-                          child: FlatButton(
-                            padding: EdgeInsets.only(left: 0, right: 0),
-                            onPressed: (){},
-                            color: Colors.red,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))),
-                            splashColor: Colors.yellow,
-                            child: Icon(
-                              Icons.lightbulb_outline,
-                              color: Colors.yellowAccent[700],
-                              size: 40,
-                            ),
-                          ),
-                        ),
                         Container(
-                          //width: 150.0,
                           child: RaisedButton(
                             child: Wrap(
-                              //spacing: 10.0,
                               children: <Widget>[
-                                Icon(Icons.whatshot, color: Colors.tealAccent),
+                                Icon(Icons.lightbulb_outline, color: Colors.tealAccent),
                                 Text(
                                   'Hints',
                                   style: TextStyle(
@@ -383,22 +475,23 @@ class _Play_GameState extends State<Play_Game> {
                             ),
                             color: Colors.blue,
                             splashColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30.0))),
-                            onPressed: () {},
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30.0))),
+                            onPressed: () {_troGiup();},
                           ),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              for (var i = 0; i < 9; i++)
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            for (var i = 0; i < 9; i++)
                               Container(
-                                //width: 40.0,
                                 constraints: BoxConstraints(
                                   maxWidth: 40.0,
                                   minWidth: 30.0,
@@ -421,14 +514,13 @@ class _Play_GameState extends State<Play_Game> {
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              for (var i = 9; i < 18; i++)
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            for (var i = 9; i < 18; i++)
                               Container(
-                                //width: 40.0,
                                 constraints: BoxConstraints(
                                   maxWidth: 40.0,
                                   minWidth: 30.0,
@@ -451,15 +543,15 @@ class _Play_GameState extends State<Play_Game> {
                                   ),
                                 ),
                               ),
-                            ],
-                          )
-                        ],
-                      ),
+                          ],
+                        )
+                      ],
                     ),
+                  ),
                 ],
               ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 }
